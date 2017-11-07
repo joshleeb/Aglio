@@ -23,6 +23,7 @@ parser = require('yargs')
     .options('c', alias: 'compile', describe: 'Compile the blueprint file', default: false)
     .options('n', alias: 'include-path', describe: 'Base directory for relative includes')
     .options('q', alias: 'quiet', boolean: true, describe: 'Suppress warning messages', default: false)
+    .options('r', alias: 'private', boolean: true, describe: 'Render private endpoints', default: false)
     .options('verbose', describe: 'Show verbose information and stack traces', default: false)
     .epilog('See https://github.com/danielgtaylor/aglio#readme for more information')
 
@@ -107,13 +108,16 @@ exports.run = (argv=parser.argv, done=->) ->
     for entry in config.options
         parser.options("theme-#{entry.name}", entry)
 
+    argv.locals =
+        livePreview: false
+        private: argv.private
+
     if argv.s
         if not argv.i
             parser.showHelp()
             return done 'Invalid arguments'
 
-        argv.locals =
-            livePreview: true
+        argv.locals.livePreview = true
 
         # Set where to include files from before generating HTML
         if argv.i isnt '-'
